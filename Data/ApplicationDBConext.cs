@@ -9,7 +9,7 @@ namespace Data
 {
     public class ApplicationDBConext:DbContext
     {
-        public ApplicationDBConext(DbContextOptions dbContextOptions):base()
+        public ApplicationDBConext(DbContextOptions<ApplicationDBConext> options):base(options)
         {
             
         }
