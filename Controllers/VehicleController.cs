@@ -16,7 +16,7 @@ namespace Controllers
         {
             _context=context;
         }
-        [HttpGet]
+        [HttpGet("validate")]
         public IActionResult FastTagValid([FromBody] string reg_number)
         {
             var vehicle=_context.FastTagVehicles.Find(reg_number);
@@ -30,7 +30,7 @@ namespace Controllers
             output.StatusCode=200;
             return output;
         }
-        [HttpGet]
+        [HttpGet("balance")]
         public IActionResult GetBalance([FromBody] string reg_number)
         {
             var vehicle=_context.FastTagVehicles.Find(reg_number);
@@ -44,7 +44,7 @@ namespace Controllers
             output.StatusCode=200;
             return output;
         }
-        [HttpPut]
+        [HttpPut("deduct")]
         public IActionResult DeductBalance([FromBody] string reg_number)
         {
             var vehicle=_context.FastTagVehicles.Find(reg_number);

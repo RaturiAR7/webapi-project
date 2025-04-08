@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-// builder.Services.AddOpenApi();
+builder.Services.AddControllers(); // Add this line to register controllers
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-string connectionString=builder.Configuration.GetConnectionString("DBConnection")??string.Empty;
-builder.Services.AddDbContext<ApplicationDBConext>(options=>{
-    options.UseMySql(connectionString,ServerVersion.AutoDetect(connectionString));
+string connectionString = builder.Configuration.GetConnectionString("DBConnection") ?? string.Empty;
+builder.Services.AddDbContext<ApplicationDBConext>(options =>
+{
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
 var app = builder.Build();
@@ -24,5 +24,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapControllers(); // Add this line to map controller endpoints
 
 app.Run();
