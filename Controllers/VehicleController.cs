@@ -17,9 +17,9 @@ namespace Controllers
             _context=context;
         }
         [HttpGet("validate")]
-        public IActionResult FastTagValid([FromBody] string reg_number)
+        public IActionResult FastTagValid([FromQuery] string reg_number)
         {
-            var vehicle=_context.FastTagVehicles.Find(reg_number);
+            var vehicle = _context.FastTagVehicles.FirstOrDefault(v => v.RegNumber == reg_number);
             if(vehicle==null)
             {
                 var result = NotFound("vehicle not found");
@@ -31,9 +31,9 @@ namespace Controllers
             return output;
         }
         [HttpGet("balance")]
-        public IActionResult GetBalance([FromBody] string reg_number)
+        public IActionResult GetBalance([FromQuery] string reg_number)
         {
-            var vehicle=_context.FastTagVehicles.Find(reg_number);
+            var vehicle = _context.FastTagVehicles.FirstOrDefault(v => v.RegNumber == reg_number);
             if(vehicle==null)
             {
                 var result = NotFound("vehicle not found");
@@ -44,26 +44,27 @@ namespace Controllers
             output.StatusCode=200;
             return output;
         }
-        [HttpPut("deduct")]
-        public IActionResult DeductBalance([FromBody] string reg_number)
+
+
+    [HttpPut("deduct")]
+    public IActionResult DeductBalance([FromQuery] string RegNumber, [FromBody] int Amount)
+    {
+        var vehicle = _context.FastTagVehicles.FirstOrDefault(v => v.RegNumber == RegNumber);
+        if (vehicle == null)
         {
-            var vehicle=_context.FastTagVehicles.Find(reg_number);
-            if(vehicle==null)
-            {
-                var result = NotFound("vehicle not found");
-                result.StatusCode = 404;
-                return result;
-            }
-            vehicle.Balance-=100;
-            if(vehicle.Balance<0)
-            {
-                var result = BadRequest("Insufficient balance");
-                result.StatusCode = 400;
-                return result;
-            }
-            _context.FastTagVehicles.Update(vehicle);
-            _context.SaveChanges();
-            return Ok("Remaining Balance:"+vehicle.Balance);
+            return NotFound("Vehicle not found");
         }
+
+        if (vehicle.Balance - Amount < 0)
+        {
+            return BadRequest("Insufficient balance");
+        }
+
+        vehicle.Balance -= Amount;
+        _context.FastTagVehicles.Update(vehicle);
+        _context.SaveChanges();
+
+        return Ok($"Remaining Balance: {vehicle.Balance}");
+    }
     }
 }
