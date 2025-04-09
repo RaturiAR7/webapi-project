@@ -10,14 +10,18 @@ namespace Models
     [Table("vehicle")]
     public class FastTagVehicle
     {
+        [Required]
         [Key][Column("id",TypeName ="INT")]
         public int Id { get; set; }
+        [Required]
         [Column("reg_num", TypeName = "VARCHAR(50)")]
         public string RegNumber { get; set; }= string.Empty;
         [Column("tag_serial", TypeName = "INT")]
+        [Required]
         public int FastTagSerial  { get; set; }
         [Column("balance", TypeName = "INT")]
-        public int Balance { get; set; }
+        
+        public int Balance { get; set; }= 0;
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }

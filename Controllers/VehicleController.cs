@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Data;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 
 namespace Controllers
 {
@@ -15,6 +16,13 @@ namespace Controllers
         public VehicleController(ApplicationDBConext context)
         {
             _context=context;
+        }
+        [HttpPost("create")]
+        public IActionResult CreateVehicle([FromBody] FastTagVehicle fastTagVehicle)
+        {
+            _context.FastTagVehicles.Add(fastTagVehicle);
+            _context.SaveChanges();
+            return Ok("Vehicle created successfully");
         }
         [HttpGet("validate")]
         public IActionResult FastTagValid([FromQuery] string reg_number)
@@ -44,7 +52,6 @@ namespace Controllers
             output.StatusCode=200;
             return output;
         }
-
 
     [HttpPut("deduct")]
     public IActionResult DeductBalance([FromQuery] string RegNumber, [FromBody] int Amount)
