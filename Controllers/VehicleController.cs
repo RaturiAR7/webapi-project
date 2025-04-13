@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Data;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Repositories;
 
 namespace Controllers
 {
@@ -12,65 +13,48 @@ namespace Controllers
     [ApiController]
     public class VehicleController:ControllerBase
     {
-        private readonly ApplicationDBConext _context;
-        public VehicleController(ApplicationDBConext context)
+        private readonly IFastTagVehicleRepository _vehicleRepository;
+        public VehicleController(IFastTagVehicleRepository vehicleRepository)
         {
-            _context=context;
+            _vehicleRepository = vehicleRepository;
         }
+
+
         [HttpPost("create")]
         public IActionResult CreateVehicle([FromBody] FastTagVehicle fastTagVehicle)
         {
-            _context.FastTagVehicles.Add(fastTagVehicle);
-            _context.SaveChanges();
+            _vehicleRepository.Insert(fastTagVehicle);
+            _vehicleRepository.Save();
             return Ok("Vehicle created successfully");
         }
         [HttpGet("validate")]
         public IActionResult FastTagValid([FromQuery] string reg_number)
         {
-            var vehicle = _context.FastTagVehicles.FirstOrDefault(v => v.RegNumber == reg_number);
-            if(vehicle==null)
-            {
-                var result = NotFound("vehicle not found");
-                result.StatusCode = 404;
-                return result;
-            }
-            var output=Ok(vehicle);
-            output.StatusCode=200;
-            return output;
+            var vehicle=_vehicleRepository.GetById(reg_number);
+            return Ok(vehicle);
         }
         [HttpGet("balance")]
         public IActionResult GetBalance([FromQuery] string reg_number)
         {
-            var vehicle = _context.FastTagVehicles.FirstOrDefault(v => v.RegNumber == reg_number);
-            if(vehicle==null)
-            {
-                var result = NotFound("vehicle not found");
-                result.StatusCode = 404;
-                return result;
-            }
-            var output=Ok(vehicle.Balance);
-            output.StatusCode=200;
-            return output;
+            var vehicle=_vehicleRepository.GetById(reg_number);
+            return Ok(vehicle.Balance);
         }
 
     [HttpPut("deduct")]
     public IActionResult DeductBalance([FromQuery] string RegNumber, [FromBody] int Amount)
     {
-        var vehicle = _context.FastTagVehicles.FirstOrDefault(v => v.RegNumber == RegNumber);
+        var vehicle = _vehicleRepository.GetById(RegNumber);
         if (vehicle == null)
         {
             return NotFound("Vehicle not found");
         }
-
-        if (vehicle.Balance - Amount < 0)
+        if (vehicle.Balance < Amount)
         {
             return BadRequest("Insufficient balance");
         }
-
         vehicle.Balance -= Amount;
-        _context.FastTagVehicles.Update(vehicle);
-        _context.SaveChanges();
-
+        _vehicleRepository.Update(vehicle);
+        _vehicleRepository.Save();
         return Ok($"Remaining Balance: {vehicle.Balance}");
     }
     }

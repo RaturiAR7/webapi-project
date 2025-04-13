@@ -14,6 +14,7 @@ namespace Models
         [Key][Column("id",TypeName ="INT")]
         public int Id { get; set; }
         [Required]
+        [StringLength(10,ErrorMessage ="Reg Number should be less than 10 characters")]
         [Column("reg_num", TypeName = "VARCHAR(50)")]
         public string RegNumber { get; set; }= string.Empty;
         [Column("tag_serial", TypeName = "INT")]
