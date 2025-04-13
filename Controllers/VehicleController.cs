@@ -18,7 +18,12 @@ namespace Controllers
         {
             _vehicleRepository = vehicleRepository;
         }
-
+        [HttpGet("all")]
+        public IActionResult GetAllVehicles()
+        {
+            var vehciles=_vehicleRepository.GetAll();
+            return Ok(vehciles);
+        }
 
         [HttpPost("create")]
         public IActionResult CreateVehicle([FromBody] FastTagVehicle fastTagVehicle)
